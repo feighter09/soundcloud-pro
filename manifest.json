@@ -2,13 +2,13 @@
   "manifest_version": 2,
 
   "name": "SoundCloud Pro",
-  "description": "This extension demonstrates a 'browser action' with kittens.",
-  "version": "1.0",
+  "description": "Allows you to up or down vote songs in your SoundCloud stream. Down voted songs will not be shown or played after being down voted.",
+  "version": "1.0.1",
 
   "browser_action": {},
   "permissions": [ 
     "tabs"
-   ],
+  ],
 
   "background": 
   {
@@ -18,7 +18,7 @@
   "content_scripts": [
     {
       "matches": ["http://soundcloud.com/stream*", "https://soundcloud.com/stream*", "http://www.soundcloud.com/stream*", "https://www.soundcloud.com/stream*"],
-      "js": ["filter.js", "jquery-2.1.1.min.js"],
+      "js": ["jquery-2.1.1.min.js", "filter.js"],
       "css": ["css/SoundCloudPro.css"],
       "run_at": "document_end"
     }

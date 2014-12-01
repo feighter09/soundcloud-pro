@@ -18,6 +18,9 @@
       if ($(query)[0] === undefined) { continue } // sound in filter list is not displayed "yet"
       var wholeDiv = $(query)[0].parentElement.parentElement
       var soundHeader = findChildWithClassName($(query)[0], "sound__header")
+      if (soundHeader === null) {
+        soundHeader = findChildWithClassName($(query)[0].children[1], "sound__header")
+      }
       var playButton = soundHeader.children[0].children[1].children[0].children[0]
 
       var observer = new WebKitMutationObserver(function(mutations) {
@@ -81,12 +84,12 @@
   }
 
   function initLocalStorage() {
-    // if (localStorage.upVotes === undefined) {
+    if (localStorage.upVotes === undefined) {
       localStorage.upVotes = JSON.stringify([])
-    // }
-    // if (localStorage.downVotes === undefined) {
+    }
+    if (localStorage.downVotes === undefined) {
       localStorage.downVotes = JSON.stringify([])
-    // }
+    }
   }
 
   function waitUntilStreamLoads(callback) {
@@ -136,13 +139,20 @@
       buttonContainer.insertBefore(upVoteBtn, buttonContainer.firstChild)
     })
     var config = { attributes: true, childList: true, characterData: true }
-    var eltThatMutates = findChildWithClassName(streamEntry.children[0].children[0], "sound__header").children[0]
+    var soundHeader = findChildWithClassName(streamEntry.children[0].children[0], "sound__header")
+    if (soundHeader === null) {  // sound with background, go one deeper
+      soundHeader = findChildWithClassName(streamEntry.children[0].children[0].children[1], "sound__header")
+    }
+    var eltThatMutates = soundHeader.children[0]
     observer.observe(eltThatMutates, config)
   }
 
   function findTagContainer(soundDiv) {
     var parent = soundDiv.children[0].children[0]
-    var halfWay = findChildWithClassName(parent, "sound__header")   
+    var halfWay = findChildWithClassName(parent, "sound__header")
+    if (halfWay === null) {   
+      halfWay = findChildWithClassName(parent.children[1], "sound__header") // it's a sound with a background, go one deeper
+    }
     return halfWay.children[0].children[1].children[1].children[0].children[0]
   }
 
@@ -159,7 +169,11 @@
 
   function getTitleFromButton(button) {
     var titleDiv = button.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement
-    return titleDiv.getAttribute("aria-label")
+    if (titleDiv.getAttribute("aria-label") !== null) {
+      return titleDiv.getAttribute("aria-label")
+    } else {
+      return titleDiv.parentElement.getAttribute("aria-label")  // again, has background so go one more up
+    }
   }
 
   /* Local Storage Retrieval */
