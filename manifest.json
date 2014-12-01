@@ -19,7 +19,9 @@
     {
       "matches": ["http://soundcloud.com/stream*", "https://soundcloud.com/stream*", "http://www.soundcloud.com/stream*", "https://www.soundcloud.com/stream*"],
       "js": ["filter.js", "jquery-2.1.1.min.js"],
+      "css": ["css/SoundCloudPro.css"],
       "run_at": "document_end"
     }
-  ]
+  ],
+  "web_accessible_resources": ["img/thumbUp.png", "img/thumbDown.png"]
 }

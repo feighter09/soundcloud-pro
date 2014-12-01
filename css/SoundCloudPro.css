@@ -1,0 +1,12 @@
+.soundCloudProVoteButton {
+  background-color: transparent;
+  border-color: transparent;
+  width: 20px;
+  height: 20px;
+  margin: 0px;
+  padding: 0px;
+}
+
+.soundCloudProVoteButton img {
+  height: 100%;
+}

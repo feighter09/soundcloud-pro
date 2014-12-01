@@ -21,7 +21,6 @@
       var playButton = soundHeader.children[0].children[1].children[0].children[0]
 
       var observer = new WebKitMutationObserver(function(mutations) {
-        console.log(mutations)
         for (var i = 0; i < mutations.length; i++) {
           if (mutations[i].target.title == "Pause") {   // a down voted song just started playing
             $(".skipControl__next")[0].click()          // skip it
@@ -108,26 +107,43 @@
 
   function addVoteButtonsToStreamEntry(streamEntry) {    
     var upVoteBtn = document.createElement("button")
-    upVoteBtn.innerHTML = "Thumbs Up"
+    upVoteBtn.className = "soundCloudProVoteButton"
+    var upVoteBtnImage = document.createElement("img")
+    upVoteBtnImage.src = chrome.extension.getURL("img/thumbUp.png")
+    upVoteBtn.appendChild(upVoteBtnImage)
     upVoteBtn.addEventListener("click", function(event) {
       upVoteSound( getTitleFromButton(this) )
     })
 
     var downVoteBtn = document.createElement("button")
-    downVoteBtn.innerHTML = "Thumbs Down"
+    downVoteBtn.className = "soundCloudProVoteButton"
+    var downVoteBtnImage = document.createElement("img")
+    downVoteBtnImage.src = chrome.extension.getURL("img/thumbDown.png")
+    downVoteBtn.appendChild(downVoteBtnImage)
     downVoteBtn.addEventListener("click", function(event) {
       downVoteSound( getTitleFromButton(this) )
     })
 
-    var footer = findFooter(streamEntry)
-    footer.appendChild(upVoteBtn)
-    footer.appendChild(downVoteBtn)
+    // add the buttons
+    var buttonContainer = findTagContainer(streamEntry)
+    buttonContainer.insertBefore(downVoteBtn, buttonContainer.firstChild)
+    buttonContainer.insertBefore(upVoteBtn, buttonContainer.firstChild)
+
+    // and since they tend to disappear randomly
+    var observer = new WebKitMutationObserver(function(mutations) {
+      var buttonContainer = findTagContainer(streamEntry)                   // re-add them if they do 
+      buttonContainer.insertBefore(downVoteBtn, buttonContainer.firstChild)
+      buttonContainer.insertBefore(upVoteBtn, buttonContainer.firstChild)
+    })
+    var config = { attributes: true, childList: true, characterData: true }
+    var eltThatMutates = findChildWithClassName(streamEntry.children[0].children[0], "sound__header").children[0]
+    observer.observe(eltThatMutates, config)
   }
 
-  function findFooter(soundDiv) {
+  function findTagContainer(soundDiv) {
     var parent = soundDiv.children[0].children[0]
-    var halfWay = findChildWithClassName(parent, "sound__footer")
-    return halfWay.children[0].children[0].children[0]
+    var halfWay = findChildWithClassName(parent, "sound__header")   
+    return halfWay.children[0].children[1].children[1].children[0].children[0]
   }
 
   function findChildWithClassName(parent, className) {
@@ -142,7 +158,7 @@
   }
 
   function getTitleFromButton(button) {
-    var titleDiv = button.parentElement.parentElement.parentElement.parentElement.parentElement
+    var titleDiv = button.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement
     return titleDiv.getAttribute("aria-label")
   }
 
