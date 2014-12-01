@@ -1,0 +1,25 @@
+{
+  "manifest_version": 2,
+
+  "name": "SoundCloud Pro",
+  "description": "This extension demonstrates a 'browser action' with kittens.",
+  "version": "1.0",
+
+  "browser_action": {},
+  "permissions": [ 
+    "tabs"
+   ],
+
+  "background": 
+  {
+    "scripts": []
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["http://soundcloud.com/stream*", "https://soundcloud.com/stream*", "http://www.soundcloud.com/stream*", "https://www.soundcloud.com/stream*"],
+      "js": ["filter.js", "jquery-2.1.1.min.js"],
+      "run_at": "document_end"
+    }
+  ]
+}
