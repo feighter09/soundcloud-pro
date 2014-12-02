@@ -14,12 +14,13 @@
   function filterStream() {
     var filterList = getDownVotes()
     for (var i = 0; i < filterList.length; i++) {      
-      var query = "div[aria-label='" + filterList[i] + "']"
-      if ($(query)[0] === undefined) { continue } // sound in filter list is not displayed "yet"
-      var wholeDiv = $(query)[0].parentElement.parentElement
-      var soundHeader = findChildWithClassName($(query)[0], "sound__header")
+      var soundBox = soundBoxForTitle(filterList[i])
+      if (soundBox === undefined) { continue } // sound in filter list is not displayed "yet"
+
+      var wholeDiv = soundBox.parentElement.parentElement
+      var soundHeader = findChildWithClassName(soundBox, "sound__header")
       if (soundHeader === null) {
-        soundHeader = findChildWithClassName($(query)[0].children[1], "sound__header")
+        soundHeader = findChildWithClassName(soundBox.children[1], "sound__header")
       }
       var playButton = soundHeader.children[0].children[1].children[0].children[0]
 
@@ -176,6 +177,10 @@
     }
   }
 
+  function soundBoxForTitle (title) {
+    return $("div[aria-label='" + title + "']")[0]
+  }
+
   /* Local Storage Retrieval */
 
   function getDownVotes() {
@@ -203,7 +208,7 @@
   function addUpVote(upVote) {
     var newUpVotes = getUpVotes()
     newUpVotes.push(upVote)
-    localStorage.upVotes = JSON.stringify( upVote )
+    localStorage.upVotes = JSON.stringify( newUpVotes )
   }
 
   function removeUpVote(upVote) {
