@@ -2,8 +2,12 @@
   "manifest_version": 2,
 
   "name": "SoundCloud Pro",
-  "description": "Allows you to up or down vote songs in your SoundCloud stream. Down voted songs will not be shown or played after being down voted.",
   "version": "1.0.1",
+  "description": "Allows you to up or down vote songs in your SoundCloud stream. Down voted songs will not be shown or played after being down voted.",
+  "icons": {
+    "48": "img/cloud48.png",
+    "128": "img/cloud128.png"
+  },
 
   "browser_action": {},
   "permissions": [ 
