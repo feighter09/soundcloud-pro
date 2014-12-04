@@ -1,0 +1,25 @@
+<html id="settingsHTML">
+<head>
+  <link rel="stylesheet" type="text/css" href="css/settings.css">
+</head>
+<body id="settingsBody">
+  <div id="settingsPanel">
+    <div id="settings">
+      Clicking thumbs down removes sound for: 
+      <select id="hiddenTime">
+        <option value="0">0 hour</option>
+        <option value="1">1 hour</option>
+        <option value="2">2 hours</option>
+        <option value="8">8 hours</option>
+        <option value="24">a day</option>
+        <option value="168">a week</option>
+        <option value="8760">forever</option>
+      </select>
+      <button id="formButton">Save</button>
+    </div>
+  </div>
+
+  <script src="jquery-2.1.1.min.js"></script>
+  <script src="settings.js"></script>
+</body>
+</html>

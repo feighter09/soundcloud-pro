@@ -1,4 +1,7 @@
-(function() {
+(function () {
+  var CLEAR_STORAGE = false
+  var DEFAULT_HIDDEN_TIME = 24
+
   if ( !supportsHtml5Storage() ) {
     alert("SoundCloud Pro requires local storage, which is not supported by the current browser")
     return
@@ -12,30 +15,38 @@
   })
 
   function filterStream() {
-    var filterList = getDownVotes()
-    for (var i = 0; i < filterList.length; i++) {      
-      var soundBox = soundBoxForTitle(filterList[i])
-      if (soundBox === undefined) { continue } // sound in filter list is not displayed "yet"
+    // gotta get how long we hide sounds from async storage
+    chrome.storage.sync.get('hiddenTime', function (result) {
+      var hiddenTime = result.hiddenTime ? result.hiddenTime : DEFAULT_HIDDEN_TIME
+      var filterList = getDownVotes()
+      for (var i = 0; i < filterList.length; i++) {
+        var downVote = filterList[i]
+        var expirationTime = new Date(downVote.time.getTime() + hiddenTime*60*60*1000) // milliseconds
+        if (Date.now() > expirationTime) { return }
 
-      var wholeDiv = soundBox.parentElement.parentElement
-      var soundHeader = findChildWithClassName(soundBox, "sound__header")
-      if (soundHeader === null) {
-        soundHeader = findChildWithClassName(soundBox.children[1], "sound__header")
-      }
-      var playButton = soundHeader.children[0].children[1].children[0].children[0]
+        var soundBox = soundBoxForDownVote(downVote)
+        if (soundBox === undefined) { return } // sound in filter list is not displayed "yet"
 
-      var observer = new WebKitMutationObserver(function(mutations) {
-        for (var i = 0; i < mutations.length; i++) {
-          if (mutations[i].target.title == "Pause") {   // a down voted song just started playing
-            $(".skipControl__next")[0].click()          // skip it
-          }
+        var soundHeader = findChildWithClassName(soundBox, "sound__header")
+        if (soundHeader === null) {
+          soundHeader = findChildWithClassName(soundBox.children[1], "sound__header")
         }
-      })
-      var config = { attributes: true, childList: true, characterData: true }
-      observer.observe(playButton, config)
+        var playButton = soundHeader.children[0].children[1].children[0].children[0]
 
-      wholeDiv.hidden = true
-    }
+        var observer = new WebKitMutationObserver(function(mutations) {
+          for (var i = 0; i < mutations.length; i++) {
+            if (mutations[i].target.title == "Pause") {   // a down voted song just started playing
+              $(".skipControl__next")[0].click()          // skip it
+            }
+          }
+        })
+        var config = { attributes: true, childList: true, characterData: true }
+        observer.observe(playButton, config)
+
+        var wholeDiv = soundBox.parentElement.parentElement
+        wholeDiv.hidden = true
+      }
+    })
   }
 
   function addVoteButtons() {
@@ -85,10 +96,16 @@
   }
 
   function initLocalStorage() {
-    if (localStorage.upVotes === undefined) {
+    if (localStorage.madeTimeTransition0 === undefined) {
+      localStorage.upVotes = JSON.stringify([])
+      localStorage.downVotes = JSON.stringify([])
+      localStorage.madeTimeTransition0 = true
+    }
+
+    if (CLEAR_STORAGE || !localStorage.upVotes) {
       localStorage.upVotes = JSON.stringify([])
     }
-    if (localStorage.downVotes === undefined) {
+    if (CLEAR_STORAGE || !localStorage.downVotes) {
       localStorage.downVotes = JSON.stringify([])
     }
   }
@@ -177,19 +194,23 @@
     }
   }
 
-  function soundBoxForTitle (title) {
-    return $("div[aria-label='" + title + "']")[0]
+  function soundBoxForDownVote (downVote) {
+    var queryStr = downVote.title.replace(/([ #;?%&,.+*~\':"!^$[\]()=>|\/@])/g,'\\$1')
+    return $('div[aria-label="' + queryStr + '"]')[0]
   }
 
   /* Local Storage Retrieval */
 
   function getDownVotes() {
     return JSON.parse(localStorage.downVotes)
+               .map(function(downVote) {
+                 return {title: downVote.title, time: new Date(Date.parse(downVote.time))}
+               })
   }
 
   function addDownVote(downVote) {
     var newDownVotes = getDownVotes()
-    newDownVotes.push(downVote)
+    newDownVotes.push({title: downVote, time: new Date()})
     localStorage.downVotes = JSON.stringify( newDownVotes )
   }
 

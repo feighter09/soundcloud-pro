@@ -1,0 +1,14 @@
+What is up yo.
+
+
+Version 1.1.0
+  - add settings page
+  - thumbs down hides sounds for variable time
+
+Version 1.0.1
+  - Those listings with the background pictures you know that 3lau puts out all the time, 
+  - yeah those are different so this made them work
+
+Version 1.0.0
+  - Thumbs Up/Down on sounds
+  - downvote permanantely removes the sound from stream

@@ -1,0 +1,8 @@
+#settingsHTML, #settingsBody {
+  width: 350px;
+}
+
+#formButton {
+  float: right;
+  margin: 10px 30px;
+}
