@@ -1,5 +1,8 @@
 What is up yo.
 
+Version 1.1.1
+  - little refactor
+  - was filter really working before this?
 
 Version 1.1.0
   - add settings page

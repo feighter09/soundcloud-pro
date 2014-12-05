@@ -2,7 +2,7 @@
   "manifest_version": 2,
 
   "name": "SoundCloud Pro",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Allows you to up or down vote songs in your SoundCloud stream. Down voted songs will not be shown or played after being down voted.",
   "icons": {
     "48": "img/cloud48.png",
@@ -12,12 +12,12 @@
   "browser_action": {
     "default_popup": "settings.html"
   },
-  "permissions": [ 
+  "permissions": [
     "storage",
     "tabs"
   ],
 
-  "background": 
+  "background":
   {
     "scripts": []
   },
@@ -25,7 +25,7 @@
   "content_scripts": [
     {
       "matches": ["http://soundcloud.com/stream*", "https://soundcloud.com/stream*", "http://www.soundcloud.com/stream*", "https://www.soundcloud.com/stream*"],
-      "js": ["jquery-2.1.1.min.js", "filter.js", "settings.js"],
+      "js": ["js/jquery-2.1.1.min.js", "js/filter.js", "js/settings.js"],
       "css": ["css/SoundCloudPro.css", "css/settings.css"],
       "run_at": "document_end"
     }

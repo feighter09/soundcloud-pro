@@ -22,10 +22,10 @@
       for (var i = 0; i < filterList.length; i++) {
         var downVote = filterList[i]
         var expirationTime = new Date(downVote.time.getTime() + hiddenTime*60*60*1000) // milliseconds
-        if (Date.now() > expirationTime) { return }
+        if (Date.now() > expirationTime) { continue }
 
         var soundBox = soundBoxForDownVote(downVote)
-        if (soundBox === undefined) { return } // sound in filter list is not displayed "yet"
+        if (soundBox === undefined) { continue } // sound in filter list is not displayed "yet"
 
         var soundHeader = findChildWithClassName(soundBox, "sound__header")
         if (soundHeader === null) {
