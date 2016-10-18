@@ -21,17 +21,18 @@
       var filterList = getDownVotes()
       for (var i = 0; i < filterList.length; i++) {
         var downVote = filterList[i]
-        var expirationTime = new Date(downVote.time.getTime() + hiddenTime*60*60*1000) // milliseconds
+        var expirationTime = new Date(downVote.time.getTime() + hiddenTime * 60 * 60 * 1000) // milliseconds
         if (Date.now() > expirationTime) { continue }
 
         var soundBox = soundBoxForDownVote(downVote)
         if (soundBox === undefined) { continue } // sound in filter list is not displayed "yet"
 
-        var soundHeader = findChildWithClassName(soundBox, "sound__header")
-        if (soundHeader === null) {
-          soundHeader = findChildWithClassName(soundBox.children[1], "sound__header")
-        }
-        var playButton = soundHeader.children[0].children[1].children[0].children[0]
+        var soundBody = findChildWithClassName(soundBox, "sound__body")
+        var soundContent = findChildWithClassName(soundBody, "sound__content")
+        var soundHeader = findChildWithClassName(soundContent, "sound__header")
+        var soundTitle = findChildWithClassName(soundHeader, "soundTitle")
+        var soundTitleContainer = findChildWithClassName(soundTitle, "soundTitle__titleContainer")
+        var playButton = findChildWithClassName(soundTitleContainer, "soundTitle__playButton").children[0]
 
         var observer = new WebKitMutationObserver(function(mutations) {
           for (var i = 0; i < mutations.length; i++) {
@@ -58,7 +59,9 @@
 
   function observeStreamChanges() {
     var streamDiv = document.getElementsByClassName("stream")[0]
-    var streamList = streamDiv.children[1].children[0].children[0]
+    var streamList = findChildWithClassName(streamDiv, "stream__list")
+    var lazyList = findChildWithClassName(streamList, "lazyLoadingList")
+    var underlyingList = findChildWithClassName(lazyList, "lazyLoadingList__list")
 
     var observer = new WebKitMutationObserver(function(mutations) {
       for (var i = 0; i < mutations.length; i++) {
@@ -69,7 +72,7 @@
       filterStream()
     })
     var config = { attributes: true, childList: true, characterData: true }
-    observer.observe(streamList, config)
+    observer.observe(underlyingList, config)
   }
 
   function upVoteSound(sound) {
@@ -117,7 +120,7 @@
       return
     }
 
-    var streamList = streamDiv.children[1].children[0]
+    var streamList = streamDiv.children[2].children[0]
     var observer = new WebKitMutationObserver(function(mutations) {
       observer.disconnect()
       callback()
@@ -127,14 +130,14 @@
   }
 
   function addVoteButtonsToStreamEntry(streamEntry) {    
-    var upVoteBtn = document.createElement("button")
-    upVoteBtn.className = "soundCloudProVoteButton"
-    var upVoteBtnImage = document.createElement("img")
-    upVoteBtnImage.src = chrome.extension.getURL("img/thumbUp.png")
-    upVoteBtn.appendChild(upVoteBtnImage)
-    upVoteBtn.addEventListener("click", function(event) {
-      upVoteSound( getTitleFromButton(this) )
-    })
+    // var upVoteBtn = document.createElement("button")
+    // upVoteBtn.className = "soundCloudProVoteButton"
+    // var upVoteBtnImage = document.createElement("img")
+    // upVoteBtnImage.src = chrome.extension.getURL("img/thumbUp.png")
+    // upVoteBtn.appendChild(upVoteBtnImage)
+    // upVoteBtn.addEventListener("click", function(event) {
+    //   upVoteSound( getTitleFromButton(this) )
+    // })
 
     var downVoteBtn = document.createElement("button")
     downVoteBtn.className = "soundCloudProVoteButton"
@@ -147,6 +150,8 @@
 
     // add the buttons
     var buttonContainer = findTagContainer(streamEntry)
+    if (buttonContainer === null) { return }  // Playlist, not single song
+
     buttonContainer.insertBefore(downVoteBtn, buttonContainer.firstChild)
     buttonContainer.insertBefore(upVoteBtn, buttonContainer.firstChild)
 
@@ -157,21 +162,26 @@
       buttonContainer.insertBefore(upVoteBtn, buttonContainer.firstChild)
     })
     var config = { attributes: true, childList: true, characterData: true }
+
     var soundHeader = findChildWithClassName(streamEntry.children[0].children[0], "sound__header")
     if (soundHeader === null) {  // sound with background, go one deeper
       soundHeader = findChildWithClassName(streamEntry.children[0].children[0].children[1], "sound__header")
     }
-    var eltThatMutates = soundHeader.children[0]
+    var eltThatMutates = findTagContainer(streamEntry).parentElement.parentElement
     observer.observe(eltThatMutates, config)
   }
 
   function findTagContainer(soundDiv) {
-    var parent = soundDiv.children[0].children[0]
-    var halfWay = findChildWithClassName(parent, "sound__header")
-    if (halfWay === null) {   
-      halfWay = findChildWithClassName(parent.children[1], "sound__header") // it's a sound with a background, go one deeper
+    var body = findChildWithClassName(soundDiv.children[0].children[0], "sound__body")
+    var content = findChildWithClassName(body, "sound__content")
+    if (content === null) { // song with artwork
+      content = findChildWithClassName(body, "visualSound__wrapper")
     }
-    return halfWay.children[0].children[1].children[1].children[0].children[0]
+    var header = findChildWithClassName(content, "sound__header")
+  
+    var title = findChildWithClassName(header.children[0], "soundTitle__titleContainer")
+    var tagContainer = findChildWithClassName(title, "soundTitle__additionalContainer")
+    return findChildWithClassName(tagContainer, "soundTitle__tagContainer")
   }
 
   function findChildWithClassName(parent, className) {
